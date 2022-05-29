@@ -24,6 +24,28 @@ class ResPartnerService(Component):
         partner = self.env["res.partner"].browse(_id)
         return self._to_json(partner)
 
+    def search(self, name):
+        """
+        Search partners by name
+        """
+        partner_obj = self.env["res.partner"]
+        partners = partner_obj.browse(
+            [p[0] for p in partner_obj.name_search(name)]
+        )
+        return {
+            "count": len(partners),
+            "rows": [self._to_json(p) for p in partners]
+        }
+
+    def _validator_search(self):
+        return {
+            "name": {
+                "type": "string",
+                "nullable": False,
+                "required": True
+            }
+        }
+
     def _to_json(self, partner):
         """
         Private Helper method to convert a partner record to a Json
