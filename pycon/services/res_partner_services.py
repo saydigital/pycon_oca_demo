@@ -1,6 +1,7 @@
 # Copyright 2022-TODAY Rapsodoo Italia S.r.L. (www.rapsodoo.com)
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
+from odoo.addons.base_rest import restapi
 from odoo.addons.component.core import Component
 
 
@@ -17,14 +18,23 @@ class ResPartnerService(Component):
         https://www.rapsodoo.com - https://www.symphonieprime.com
     """
 
-    def get(self, _id):
+    @restapi.method(
+        [(["/<int:id>"], "GET")],
+        auth="public",
+    )
+    def get_partner_by_id(self, id):
         """
         Get partner information
         """
-        partner = self.env["res.partner"].browse(_id)
+        partner = self.env["res.partner"].browse(id)
         return self._to_json(partner)
 
-    def search(self, name):
+    @restapi.method(
+        [(["/"], "GET")],
+        input_param=restapi.CerberusValidator("_validator_search_partners"),
+        auth="public",
+    )
+    def search_partners(self, name):
         """
         Search partners by name
         """
@@ -37,7 +47,7 @@ class ResPartnerService(Component):
             "rows": [self._to_json(p) for p in partners]
         }
 
-    def _validator_search(self):
+    def _validator_search_partners(self):
         return {
             "name": {
                 "type": "string",
