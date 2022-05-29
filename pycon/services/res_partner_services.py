@@ -16,3 +16,36 @@ class ResPartnerService(Component):
          Pycon Italia 2022\n
         https://www.rapsodoo.com - https://www.symphonieprime.com
     """
+
+    def get(self, _id):
+        """
+        Get partner information
+        """
+        partner = self.env["res.partner"].browse(_id)
+        return self._to_json(partner)
+
+    def _to_json(self, partner):
+        """
+        Private Helper method to convert a partner record to a Json
+        serializable dict
+        """
+        res = {
+            "id": partner.id,
+            "name": partner.name,
+            "street": partner.street,
+            "zip": partner.zip,
+            "city": partner.city,
+            "phone": partner.phone,
+        }
+        if partner.country_id:
+            res["country"] = {
+                "id": partner.country_id.id,
+                "name": partner.country_id.name,
+            }
+        if partner.state_id:
+            res["state"] = {
+                "id": partner.state_id.id,
+                "name": partner.state_id.name
+            }
+
+        return res
